@@ -14,6 +14,58 @@
 
 const API_URL =
     "https://belmonte-home-journal-api.stafochervictoria.workers.dev/";
+//==================================================
+// FETCH HOME DATA
+//==================================================
+
+async function FetchHomeData()
+{
+    try
+    {
+        console.log(
+            "[Home Journal] Fetching live data..."
+        );
+
+
+        const response =
+            await fetch(API_URL);
+
+
+        if(!response.ok)
+        {
+            throw new Error(
+                "API response: "
+                +
+                response.status
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "[Home Journal] API connected:"
+        );
+
+        console.log(data);
+
+
+        return data;
+    }
+
+
+    catch(error)
+    {
+        console.error(
+            "[Home Journal] API error:",
+            error
+        );
+
+        return null;
+    }
+}
 const Pages =
 {
     home:
