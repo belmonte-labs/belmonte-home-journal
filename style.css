@@ -1,95 +1,1458 @@
 @import url(
-'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@500;700&display=swap'
+    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;600;700&display=swap'
 );
 
-*{
 
+/* ==========================================
+   BELMONTE HOME JOURNAL v6
+   SUPREME UPDATE
+========================================== */
+
+:root
+{
+    --bg:
+        #08090b;
+
+    --sidebar:
+        #0d0f13;
+
+    --panel:
+        #12151b;
+
+    --panel-hover:
+        #181c24;
+
+    --border:
+        rgba(255,255,255,.07);
+
+    --border-bright:
+        rgba(88,166,255,.25);
+
+    --text:
+        #f2f4f8;
+
+    --muted:
+        #858b96;
+
+    --blue:
+        #58a6ff;
+
+    --blue-soft:
+        rgba(88,166,255,.12);
+
+    --green:
+        #59d98e;
+
+    --red:
+        #ff6b6b;
+}
+
+
+/* ==========================================
+   RESET
+========================================== */
+
+*
+{
     margin:0;
     padding:0;
 
     box-sizing:border-box;
-
 }
 
 
 html,
-body{
-
+body
+{
     width:100%;
     height:100%;
 
-    background:#050505;
+    background:
+        var(--bg);
 
-    color:white;
+    color:
+        var(--text);
 
-    font-family:'Inter',sans-serif;
+    font-family:
+        'Inter',
+        sans-serif;
 
+    overflow:hidden;
 }
 
 
-#screen{
+/* ==========================================
+   APP
+========================================== */
 
+.app
+{
     width:100vw;
+    height:100vh;
+
+    display:flex;
+
+    background:
+
+        radial-gradient(
+            circle at top right,
+            rgba(88,166,255,.05),
+            transparent 35%
+        ),
+
+        var(--bg);
+}
+
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.sidebar
+{
+    width:250px;
+
     height:100vh;
 
     display:flex;
 
     flex-direction:column;
 
+    padding:28px 18px;
+
+    background:
+        rgba(13,15,19,.88);
+
+    border-right:
+        1px solid var(--border);
+
+    backdrop-filter:
+        blur(20px);
 }
 
 
-.header{
+/* ==========================================
+   BRAND
+========================================== */
 
-    padding:25px;
+.brand
+{
+    display:flex;
 
-    font-family:'Orbitron',sans-serif;
+    align-items:center;
+
+    gap:13px;
+
+    padding:
+        8px 10px
+        34px;
+}
+
+
+.brand-icon
+{
+    width:42px;
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
 
     font-size:24px;
 
-    letter-spacing:4px;
+    background:
+        var(--blue-soft);
 
-    color:#4aa3ff;
+    border:
+        1px solid var(--border-bright);
 
-    border-bottom:1px solid #222;
+    border-radius:12px;
+
+    box-shadow:
+        0 0 25px
+        rgba(88,166,255,.08);
+}
+
+
+.brand-name
+{
+    font-family:
+        'Orbitron',
+        sans-serif;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    letter-spacing:3px;
+}
+
+
+.brand-subtitle
+{
+    margin-top:3px;
+
+    font-size:9px;
+
+    letter-spacing:2px;
+
+    color:
+        var(--blue);
+}
+
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+.nav
+{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+}
+
+
+.nav-item
+{
+    width:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:13px;
+
+    padding:
+        13px 14px;
+
+    background:
+        transparent;
+
+    border:
+        1px solid transparent;
+
+    border-radius:10px;
+
+    color:
+        var(--muted);
+
+    font-family:
+        'Inter',
+        sans-serif;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+    transition:
+        .25s;
+}
+
+
+.nav-icon
+{
+    width:24px;
+
+    font-size:17px;
+
+    text-align:center;
+}
+
+
+.nav-item:hover
+{
+    color:
+        var(--text);
+
+    background:
+        rgba(255,255,255,.035);
+}
+
+
+.nav-item.active
+{
+    color:
+        var(--text);
+
+    background:
+        var(--blue-soft);
+
+    border-color:
+        var(--border-bright);
+
+    box-shadow:
+        inset 0 0 20px
+        rgba(88,166,255,.025);
+}
+
+
+/* ==========================================
+   SIDEBAR FOOTER
+========================================== */
+
+.sidebar-footer
+{
+    margin-top:auto;
+
+    padding:
+        20px 10px
+        5px;
+
+    border-top:
+        1px solid var(--border);
+}
+
+
+.system-status
+{
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-size:10px;
+
+    letter-spacing:1.2px;
+
+    color:
+        var(--muted);
+}
+
+
+.status-dot
+{
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:
+        var(--green);
+
+    box-shadow:
+        0 0 10px
+        rgba(89,217,142,.8);
+
+    animation:
+        pulse 2s infinite;
+}
+
+
+.version
+{
+    margin-top:9px;
+
+    font-family:
+        'Orbitron',
+        sans-serif;
+
+    font-size:8px;
+
+    letter-spacing:1px;
+
+    color:
+        #555b65;
+}
+
+
+/* ==========================================
+   MAIN
+========================================== */
+
+.main
+{
+    flex:1;
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+
+/* ==========================================
+   TOPBAR
+========================================== */
+
+.topbar
+{
+    height:105px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:
+        0 45px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+
+.page-eyebrow
+{
+    font-size:10px;
+
+    letter-spacing:2.5px;
+
+    color:
+        var(--blue);
+
+    margin-bottom:6px;
+}
+
+
+.topbar h1
+{
+    font-family:
+        'Orbitron',
+        sans-serif;
+
+    font-size:27px;
+
+    font-weight:600;
+
+    letter-spacing:1px;
+}
+
+
+.topbar-right
+{
+    display:flex;
+
+    align-items:center;
+
+    gap:28px;
+}
+
+
+.live-status
+{
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-size:10px;
+
+    letter-spacing:1.8px;
+
+    color:
+        var(--green);
+}
+
+
+.live-dot
+{
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:
+        var(--green);
+
+    box-shadow:
+        0 0 10px
+        rgba(89,217,142,.8);
+
+    animation:
+        pulse 2s infinite;
+}
+
+
+.clock
+{
+    font-family:
+        'Orbitron',
+        sans-serif;
+
+    font-size:15px;
+
+    letter-spacing:2px;
+
+    color:
+        var(--muted);
+}
+
+
+/* ==========================================
+   CONTENT
+========================================== */
+
+.content
+{
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:
+        42px 48px 60px;
 
 }
 
 
-.content{
+/* ==========================================
+   PAGE SYSTEM
+========================================== */
 
+.page
+{
+    display:none;
+
+    max-width:1150px;
+
+    margin:auto;
+
+    animation:
+        pageIn .35s ease;
+}
+
+
+.page.active
+{
+    display:block;
+}
+
+
+@keyframes pageIn
+{
+    from
+    {
+        opacity:0;
+
+        transform:
+            translateY(8px);
+    }
+
+    to
+    {
+        opacity:1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* ==========================================
+   WELCOME
+========================================== */
+
+.welcome
+{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:48px;
+}
+
+
+.welcome-small
+{
+    font-size:10px;
+
+    letter-spacing:2px;
+
+    color:
+        var(--blue);
+
+    margin-bottom:9px;
+}
+
+
+.welcome h2
+{
+    font-size:30px;
+
+    font-weight:500;
+
+    letter-spacing:-.5px;
+}
+
+
+.welcome p
+{
+    margin-top:9px;
+
+    color:
+        var(--muted);
+
+    font-size:14px;
+}
+
+
+/* ==========================================
+   BUTTONS
+========================================== */
+
+.sync-button,
+.action-button
+{
+    padding:
+        11px 18px;
+
+    border:
+        1px solid var(--border-bright);
+
+    border-radius:9px;
+
+    background:
+        var(--blue-soft);
+
+    color:
+        var(--blue);
+
+    font-family:
+        'Inter',
+        sans-serif;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:
+        .25s;
+}
+
+
+.sync-button:hover,
+.action-button:hover
+{
+    transform:
+        translateY(-2px);
+
+    background:
+        rgba(88,166,255,.2);
+
+    box-shadow:
+        0 8px 25px
+        rgba(88,166,255,.12);
+}
+
+
+.action-button.danger
+{
+    color:
+        var(--red);
+
+    border-color:
+        rgba(255,107,107,.25);
+
+    background:
+        rgba(255,107,107,.06);
+}
+
+
+/* ==========================================
+   SECTION HEADER
+========================================== */
+
+.section-header
+{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:18px;
+}
+
+
+.recent-header
+{
+    margin-top:42px;
+}
+
+
+.section-title
+{
+    font-size:11px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    color:
+        #c4c8d0;
+}
+
+
+.section-subtitle
+{
+    margin-top:6px;
+
+    font-size:12px;
+
+    color:
+        var(--muted);
+}
+
+
+.count-badge
+{
+    min-width:30px;
+
+    height:24px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:
+        0 8px;
+
+    border-radius:20px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    border:
+        1px solid var(--border);
+
+    font-size:11px;
+
+    color:
+        var(--muted);
+}
+
+
+/* ==========================================
+   PRESENCE CARD
+========================================== */
+
+.presence-card
+{
+    min-height:130px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:28px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.035),
+            rgba(255,255,255,.015)
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius:16px;
+}
+
+
+.empty-icon
+{
+    width:52px;
+    height:52px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,.035);
+
+    color:
+        #5d6470;
+
+    font-size:25px;
+}
+
+
+.presence-card h3
+{
+    font-size:16px;
+
+    font-weight:500;
+}
+
+
+.presence-card p
+{
+    margin-top:6px;
+
+    font-size:13px;
+
+    color:
+        var(--muted);
+}
+
+
+/* ==========================================
+   ACTIVITY LIST
+========================================== */
+
+.activity-list
+{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+}
+
+
+.activity-card
+{
+    display:flex;
+
+    align-items:center;
+
+    padding:
+        16px 20px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:13px;
+
+    background:
+        rgba(255,255,255,.018);
+
+    transition:
+        .25s;
+}
+
+
+.activity-card:hover
+{
+    transform:
+        translateX(4px);
+
+    background:
+        var(--panel-hover);
+
+    border-color:
+        var(--border-bright);
+}
+
+
+/* ==========================================
+   VISITOR
+========================================== */
+
+.visitor-avatar
+{
+    width:42px;
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(88,166,255,.25),
+            rgba(88,166,255,.06)
+        );
+
+    border:
+        1px solid
+        rgba(88,166,255,.2);
+
+    color:
+        var(--blue);
+
+    font-family:
+        'Orbitron',
+        sans-serif;
+
+    font-size:14px;
+
+    margin-right:15px;
+}
+
+
+.visitor-info
+{
     flex:1;
+}
+
+
+.visitor-name
+{
+    font-size:14px;
+
+    font-weight:500;
+}
+
+
+.visitor-user
+{
+    margin-top:4px;
+
+    font-size:11px;
+
+    color:
+        var(--muted);
+}
+
+
+.visit-info
+{
+    text-align:right;
+}
+
+
+.visit-duration
+{
+    font-family:
+        'Orbitron',
+        sans-serif;
+
+    font-size:12px;
+
+    color:
+        var(--blue);
+}
+
+
+.visit-date
+{
+    margin-top:5px;
+
+    font-size:10px;
+
+    color:
+        var(--muted);
+}
+
+
+/* ==========================================
+   TEXT BUTTON
+========================================== */
+
+.text-button
+{
+    background:none;
+
+    border:none;
+
+    color:
+        var(--blue);
+
+    font-size:12px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+
+.text-button:hover
+{
+    transform:
+        translateX(3px);
+}
+
+
+/* ==========================================
+   PAGE INTRO
+========================================== */
+
+.page-intro
+{
+    margin-bottom:34px;
+}
+
+
+.page-intro h2
+{
+    font-size:28px;
+
+    font-weight:500;
+}
+
+
+.page-intro p
+{
+    margin-top:8px;
+
+    font-size:14px;
+
+    color:
+        var(--muted);
+}
+
+
+/* ==========================================
+   JOURNAL
+========================================== */
+
+.journal-toolbar
+{
+    margin-bottom:25px;
+}
+
+
+.search
+{
+    width:100%;
+
+    padding:
+        14px 17px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:10px;
+
+    color:
+        var(--text);
+
+    font-family:
+        'Inter',
+        sans-serif;
+
+    outline:none;
+
+    transition:.25s;
+}
+
+
+.search:focus
+{
+    border-color:
+        var(--border-bright);
+
+    box-shadow:
+        0 0 20px
+        rgba(88,166,255,.06);
+}
+
+
+.journal-placeholder
+{
+    min-height:350px;
 
     display:flex;
 
     flex-direction:column;
 
+    align-items:center;
+
     justify-content:center;
+
+    text-align:center;
+
+    border:
+        1px dashed
+        rgba(255,255,255,.1);
+
+    border-radius:16px;
+
+    color:
+        var(--muted);
+}
+
+
+.placeholder-icon
+{
+    font-size:35px;
+
+    margin-bottom:15px;
+}
+
+
+.journal-placeholder h3
+{
+    color:
+        var(--text);
+
+    font-weight:500;
+}
+
+
+.journal-placeholder p
+{
+    margin-top:8px;
+
+    font-size:13px;
+}
+
+
+/* ==========================================
+   FAVORITES
+========================================== */
+
+.favorites-grid
+{
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(210px,1fr)
+        );
+
+    gap:15px;
+}
+
+
+.favorite-card
+{
+    min-height:180px;
+
+    display:flex;
+
+    flex-direction:column;
 
     align-items:center;
 
+    justify-content:center;
+
+    padding:25px;
+
+    text-align:center;
+
+    background:
+        rgba(255,255,255,.018);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:15px;
+
+    transition:.25s;
 }
 
 
-.label{
+.favorite-card:hover
+{
+    transform:
+        translateY(-5px);
 
-    color:#777;
+    border-color:
+        rgba(88,166,255,.25);
 
-    font-size:14px;
-
-    letter-spacing:3px;
-
+    background:
+        rgba(88,166,255,.035);
 }
 
 
-#visitor{
+.favorite-heart
+{
+    width:42px;
+    height:42px;
 
-    margin-top:20px;
+    display:flex;
 
-    font-size:40px;
+    align-items:center;
+    justify-content:center;
 
-    font-weight:600;
+    margin-bottom:15px;
 
-    color:#4aa3ff;
+    border-radius:50%;
 
+    background:
+        rgba(255,107,107,.08);
+
+    color:
+        #ff7a8a;
+
+    font-size:19px;
+}
+
+
+.favorite-card h3
+{
+    font-size:15px;
+
+    font-weight:500;
+}
+
+
+.favorite-card p
+{
+    margin-top:6px;
+
+    font-size:11px;
+
+    color:
+        var(--muted);
+}
+
+
+.add-favorite
+{
+    cursor:pointer;
+
+    font-size:28px;
+
+    color:
+        var(--blue);
+
+    font-family:
+        'Inter',
+        sans-serif;
+}
+
+
+.add-favorite span
+{
+    margin-top:10px;
+
+    font-size:13px;
+}
+
+
+/* ==========================================
+   SETTINGS
+========================================== */
+
+.settings-list
+{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+}
+
+
+.setting-card
+{
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:
+        22px 24px;
+
+    background:
+        rgba(255,255,255,.018);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:14px;
+}
+
+
+.setting-card h3
+{
+    font-size:15px;
+
+    font-weight:500;
+}
+
+
+.setting-card p
+{
+    margin-top:6px;
+
+    font-size:12px;
+
+    color:
+        var(--muted);
+}
+
+
+/* ==========================================
+   ANIMATIONS
+========================================== */
+
+@keyframes pulse
+{
+    0%
+    {
+        opacity:1;
+
+        transform:
+            scale(1);
+    }
+
+    50%
+    {
+        opacity:.45;
+
+        transform:
+            scale(.85);
+    }
+
+    100%
+    {
+        opacity:1;
+
+        transform:
+            scale(1);
+    }
+}
+
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+::-webkit-scrollbar
+{
+    width:7px;
+}
+
+
+::-webkit-scrollbar-track
+{
+    background:
+        transparent;
+}
+
+
+::-webkit-scrollbar-thumb
+{
+    background:
+        #252a33;
+
+    border-radius:10px;
+}
+
+
+::-webkit-scrollbar-thumb:hover
+{
+    background:
+        #343b47;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:800px)
+{
+    .sidebar
+    {
+        width:70px;
+
+        padding:
+            20px 10px;
+    }
+
+
+    .brand-text,
+    .nav-item span:not(.nav-icon),
+    .sidebar-footer
+    {
+        display:none;
+    }
+
+
+    .brand
+    {
+        justify-content:center;
+
+        padding-bottom:30px;
+    }
+
+
+    .nav-item
+    {
+        justify-content:center;
+
+        padding:13px;
+    }
+
+
+    .topbar
+    {
+        padding:
+            0 25px;
+    }
+
+
+    .content
+    {
+        padding:
+            30px 25px;
+    }
+
+
+    .welcome
+    {
+        align-items:flex-start;
+
+        flex-direction:column;
+
+        gap:20px;
+    }
+}
+
+
+@media(max-width:550px)
+{
+    .sidebar
+    {
+        display:none;
+    }
+
+
+    .topbar
+    {
+        height:90px;
+    }
+
+
+    .topbar h1
+    {
+        font-size:22px;
+    }
+
+
+    .live-status
+    {
+        display:none;
+    }
+
+
+    .content
+    {
+        padding:
+            25px 18px;
+    }
+
+
+    .setting-card
+    {
+        align-items:flex-start;
+
+        flex-direction:column;
+
+        gap:18px;
+    }
 }
