@@ -8,49 +8,778 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0">
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Belmonte Home Journal</title>
+    <title>
+        Belmonte Home Journal
+    </title>
+
+
+    <!-- Fonts -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
 
     <link
         rel="stylesheet"
-        href="style.css">
+        href="style.css"
+    >
 
 </head>
 
 
 <body>
 
-    <div id="screen">
 
-        <div class="header">
+    <!-- =========================================
+         APP
+    ========================================== -->
 
-            BELMONTE HOME JOURNAL
-
-        </div>
+    <div class="app">
 
 
-        <div class="content">
+        <!-- =====================================
+             SIDEBAR
+        ====================================== -->
 
-            <div class="label">
+        <aside class="sidebar">
 
-                CURRENTLY HOME
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🏡
+                </div>
+
+                <div class="brand-text">
+
+                    <div class="brand-name">
+                        BELMONTE
+                    </div>
+
+                    <div class="brand-subtitle">
+                        HOME JOURNAL
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div id="visitor">
+            <!-- NAVIGATION -->
 
-                Waiting for connection...
+            <nav class="nav">
+
+
+                <button
+                    class="nav-item active"
+                    onclick="Navigate('home')"
+                >
+
+                    <span class="nav-icon">
+                        🏠
+                    </span>
+
+                    <span>
+                        Home
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    onclick="Navigate('journal')"
+                >
+
+                    <span class="nav-icon">
+                        📖
+                    </span>
+
+                    <span>
+                        Journal
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    onclick="Navigate('favorites')"
+                >
+
+                    <span class="nav-icon">
+                        ♥
+                    </span>
+
+                    <span>
+                        Favorites
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    onclick="Navigate('settings')"
+                >
+
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span>
+                        Settings
+                    </span>
+
+                </button>
+
+
+            </nav>
+
+
+            <!-- SIDEBAR FOOTER -->
+
+            <div class="sidebar-footer">
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    <span>
+                        SYSTEM ONLINE
+                    </span>
+
+                </div>
+
+                <div class="version">
+
+                    HOME JOURNAL v6.0
+
+                </div>
 
             </div>
 
-        </div>
+
+        </aside>
+
+
+
+        <!-- =====================================
+             MAIN
+        ====================================== -->
+
+        <main class="main">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+                <div>
+
+                    <div
+                        class="page-eyebrow"
+                        id="pageEyebrow"
+                    >
+
+                        BELMONTE RESIDENCE
+
+                    </div>
+
+
+                    <h1
+                        id="pageTitle"
+                    >
+
+                        Home
+
+                    </h1>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+
+                    <div class="live-status">
+
+                        <span class="live-dot"></span>
+
+                        LIVE
+
+                    </div>
+
+
+                    <div
+                        class="clock"
+                        id="clock"
+                    >
+
+                        00:00
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- =================================
+                 CONTENT
+            ================================== -->
+
+            <section
+                class="content"
+                id="content"
+            >
+
+
+                <!-- HOME -->
+
+                <div
+                    class="page active"
+                    id="page-home"
+                >
+
+
+                    <div class="welcome">
+
+                        <div>
+
+                            <div class="welcome-small">
+
+                                GOOD EVENING
+
+                            </div>
+
+
+                            <h2>
+
+                                Welcome home,
+                                Victoria.
+
+                            </h2>
+
+
+                            <p>
+
+                                Your residence activity
+                                is being monitored in real time.
+
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            class="sync-button"
+                            onclick="ManualSync()"
+                        >
+
+                            ↻ Sync Now
+
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- CURRENTLY HOME -->
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <div class="section-title">
+
+                                CURRENTLY HOME
+
+                            </div>
+
+                            <div class="section-subtitle">
+
+                                Live residence presence
+
+                            </div>
+
+                        </div>
+
+
+                        <span class="count-badge">
+
+                            0
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="presence-card empty">
+
+                        <div class="empty-icon">
+
+                            ◌
+
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+
+                                Nobody is currently home
+
+                            </h3>
+
+
+                            <p>
+
+                                The residence is quiet.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- RECENT ACTIVITY -->
+
+                    <div class="section-header recent-header">
+
+                        <div>
+
+                            <div class="section-title">
+
+                                RECENT ACTIVITY
+
+                            </div>
+
+                            <div class="section-subtitle">
+
+                                Latest recorded visits
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="text-button"
+                            onclick="Navigate('journal')"
+                        >
+
+                            View Journal →
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="activity-list">
+
+
+                        <div class="activity-card">
+
+                            <div class="visitor-avatar">
+
+                                L
+
+                            </div>
+
+
+                            <div class="visitor-info">
+
+                                <div class="visitor-name">
+
+                                    ʟɪᴠᴠʏ
+
+                                </div>
+
+                                <div class="visitor-user">
+
+                                    @beepity.boop
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="visit-info">
+
+                                <div class="visit-duration">
+
+                                    1h 35m
+
+                                </div>
+
+                                <div class="visit-date">
+
+                                    Last visit
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="activity-card">
+
+                            <div class="visitor-avatar">
+
+                                J
+
+                            </div>
+
+
+                            <div class="visitor-info">
+
+                                <div class="visitor-name">
+
+                                    ᴊᴏʜɴɴʏ ᴋɴᴏᴛᴠɪʟʟᴇ
+
+                                </div>
+
+                                <div class="visitor-user">
+
+                                    @johnnyknotville
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="visit-info">
+
+                                <div class="visit-duration">
+
+                                    &lt; 1m
+
+                                </div>
+
+                                <div class="visit-date">
+
+                                    Last visit
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- JOURNAL -->
+
+                <div
+                    class="page"
+                    id="page-journal"
+                >
+
+                    <div class="page-intro">
+
+                        <h2>
+
+                            Residence Journal
+
+                        </h2>
+
+                        <p>
+
+                            A record of recent activity
+                            at the Belmonte residence.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="journal-toolbar">
+
+                        <input
+                            type="text"
+                            placeholder="Search visitors..."
+                            class="search"
+                        >
+
+                    </div>
+
+
+                    <div class="journal-placeholder">
+
+                        <div class="placeholder-icon">
+
+                            📖
+
+                        </div>
+
+
+                        <h3>
+
+                            Journal Interface
+
+                        </h3>
+
+
+                        <p>
+
+                            Your visit history will appear here.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FAVORITES -->
+
+                <div
+                    class="page"
+                    id="page-favorites"
+                >
+
+                    <div class="page-intro">
+
+                        <h2>
+
+                            Favorites
+
+                        </h2>
+
+                        <p>
+
+                            Your most important residents
+                            and frequent visitors.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="favorites-grid">
+
+
+                        <div class="favorite-card">
+
+                            <div class="favorite-heart">
+
+                                ♥
+
+                            </div>
+
+                            <h3>
+
+                                Sara Belmonte
+
+                            </h3>
+
+                            <p>
+
+                                Favorite resident
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="favorite-card">
+
+                            <div class="favorite-heart">
+
+                                ♥
+
+                            </div>
+
+                            <h3>
+
+                                Aldo Belmonte
+
+                            </h3>
+
+                            <p>
+
+                                Favorite resident
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="favorite-card">
+
+                            <div class="favorite-heart">
+
+                                ♥
+
+                            </div>
+
+                            <h3>
+
+                                Livvy
+
+                            </h3>
+
+                            <p>
+
+                                Favorite visitor
+
+                            </p>
+
+                        </div>
+
+
+                        <button class="favorite-card add-favorite">
+
+                            +
+
+                            <span>
+
+                                Add Favorite
+
+                            </span>
+
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SETTINGS -->
+
+                <div
+                    class="page"
+                    id="page-settings"
+                >
+
+                    <div class="page-intro">
+
+                        <h2>
+
+                            System Settings
+
+                        </h2>
+
+                        <p>
+
+                            Control and manage your
+                            Home Journal system.
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="settings-list">
+
+
+                        <div class="setting-card">
+
+                            <div>
+
+                                <h3>
+
+                                    Synchronization
+
+                                </h3>
+
+                                <p>
+
+                                    Request a fresh
+                                    system synchronization.
+
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                class="action-button"
+                                onclick="ManualSync()"
+                            >
+
+                                Sync Now
+
+                            </button>
+
+                        </div>
+
+
+
+                        <div class="setting-card">
+
+                            <div>
+
+                                <h3>
+
+                                    Last Check
+
+                                </h3>
+
+                                <p>
+
+                                    Reset the While You Were Away marker.
+
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                class="action-button danger"
+                            >
+
+                                Reset Check
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+        </main>
 
     </div>
 
 
     <script src="script.js"></script>
+
 
 </body>
 
