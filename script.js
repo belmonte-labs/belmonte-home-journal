@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.2
-// Home + Journal live data
+// BELMONTE HOME JOURNAL v6.3
+// Home + Journal + Add Favorite
 //==================================================
 
 const API_URL =
@@ -17,6 +17,12 @@ const Pages = {
 };
 
 let journalVisits = [];
+let lastData = {
+    currentlyHome: [],
+    recentVisits: [],
+    favorites: [],
+    lastChecked: 0
+};
 
 function EscapeHtml(value)
 {
@@ -134,8 +140,6 @@ async function FetchHomeData()
 {
     try
     {
-        console.log("[Home Journal] Fetching live data...");
-
         const response = await fetch(API_URL);
 
         if (!response.ok)
@@ -143,8 +147,7 @@ async function FetchHomeData()
 
         const data = await response.json();
 
-        console.log("[Home Journal] API connected:", data);
-
+        lastData = data;
         journalVisits = (data.recentVisits || []).slice().reverse();
 
         RenderCurrentlyHome(data);
@@ -159,6 +162,28 @@ async function FetchHomeData()
         console.error("[Home Journal] API error:", error);
         return null;
     }
+}
+
+async function PushState()
+{
+    const payload = {
+        action: "sync",
+        data: {
+            currentlyHome: lastData.currentlyHome || [],
+            recentVisits: lastData.recentVisits || [],
+            favorites: lastData.favorites || [],
+            lastChecked: lastData.lastChecked || 0
+        }
+    };
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok)
+        throw new Error("API response: " + response.status);
 }
 
 function RenderCurrentlyHome(data)
@@ -305,13 +330,51 @@ function RenderFavorites(data)
     }
 
     html += `
-        <button class="favorite-card add-favorite">
+        <button class="favorite-card add-favorite" onclick="AddFavorite()">
             +
             <span>Add Favorite</span>
         </button>
     `;
 
     container.innerHTML = html;
+}
+
+async function AddFavorite()
+{
+    const typed = prompt("Type the display name or username to add as favorite:");
+
+    if (typed === null)
+        return;
+
+    const fav = typed.trim();
+
+    if (!fav)
+        return;
+
+    const current = lastData.favorites || [];
+    const exists = current.some(function (item)
+    {
+        return String(item).trim().toLowerCase() === fav.toLowerCase();
+    });
+
+    if (exists)
+    {
+        alert("Favorite already exists: " + fav);
+        return;
+    }
+
+    lastData.favorites = current.concat([fav]);
+    RenderFavorites(lastData);
+
+    try
+    {
+        await PushState();
+    }
+    catch (error)
+    {
+        console.error("[Home Journal] Add Favorite error:", error);
+        alert("Could not save favorite to the API.");
+    }
 }
 
 function Navigate(pageName)
@@ -388,7 +451,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.2");
+    console.log("BELMONTE HOME JOURNAL v6.3");
 
     FetchHomeData();
     UpdateClock();
