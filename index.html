@@ -45,7 +45,7 @@
                     <span class="status-dot"></span>
                     <span>SYSTEM ONLINE</span>
                 </div>
-                <div class="version">HOME JOURNAL v6.1</div>
+                <div class="version">HOME JOURNAL v6.2</div>
             </div>
         </aside>
 
@@ -102,14 +102,18 @@
                         <h2>Residence Journal</h2>
                         <p>A record of recent activity at the Belmonte residence.</p>
                     </div>
+
                     <div class="journal-toolbar">
-                        <input type="text" placeholder="Search visitors..." class="search">
+                        <input
+                            id="journalSearch"
+                            type="text"
+                            placeholder="Search visitors..."
+                            class="search"
+                            oninput="FilterJournal()"
+                        >
                     </div>
-                    <div class="journal-placeholder">
-                        <div class="placeholder-icon">📖</div>
-                        <h3>Journal Interface</h3>
-                        <p>Your visit history will appear here.</p>
-                    </div>
+
+                    <div class="activity-list" id="journalContainer"></div>
                 </div>
 
                 <div class="page" id="page-favorites">
