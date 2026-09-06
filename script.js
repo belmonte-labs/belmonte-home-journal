@@ -1,19 +1,50 @@
 //==================================================
 // BELMONTE HOME JOURNAL v6
 // SUPREME UPDATE
-// Interface Controller
+// Interface + Live API
 //==================================================
 
 
-//==================================================
-// PAGE DATA
-//==================================================
 //==================================================
 // API
 //==================================================
 
 const API_URL =
     "https://belmonte-home-journal-api.stafochervictoria.workers.dev/";
+
+
+//==================================================
+// PAGE DATA
+//==================================================
+
+const Pages =
+{
+    home:
+    {
+        title: "Home",
+        eyebrow: "BELMONTE RESIDENCE"
+    },
+
+    journal:
+    {
+        title: "Journal",
+        eyebrow: "RESIDENCE ACTIVITY LOG"
+    },
+
+    favorites:
+    {
+        title: "Favorites",
+        eyebrow: "PRIORITY VISITORS"
+    },
+
+    settings:
+    {
+        title: "Settings",
+        eyebrow: "SYSTEM CONTROL"
+    }
+};
+
+
 //==================================================
 // FETCH HOME DATA
 //==================================================
@@ -52,6 +83,13 @@ async function FetchHomeData()
         console.log(data);
 
 
+        // Render live data
+
+        RenderCurrentlyHome(data);
+
+        RenderFavorites(data);
+
+
         return data;
     }
 
@@ -66,138 +104,8 @@ async function FetchHomeData()
         return null;
     }
 }
-const Pages =
-{
-    home:
-    {
-        title: "Home",
-        eyebrow: "BELMONTE RESIDENCE"
-    },
-
-    journal:
-    {
-        title: "Journal",
-        eyebrow: "RESIDENCE ACTIVITY LOG"
-    },
-
-    favorites:
-    {
-        title: "Favorites",
-        eyebrow: "PRIORITY VISITORS"
-    },
-
-    settings:
-    {
-        title: "Settings",
-        eyebrow: "SYSTEM CONTROL"
-    }
-};
 
 
-//==================================================
-// NAVIGATION
-//==================================================
-
-function Navigate(pageName)
-{
-    console.log(
-        "[Home Journal] Navigating to:",
-        pageName
-    );
-
-
-    // Remove active page
-
-    const pages =
-        document.querySelectorAll(".page");
-
-
-    pages.forEach(
-        function(page)
-        {
-            page.classList.remove("active");
-        }
-    );
-
-
-    // Activate requested page
-
-    const targetPage =
-        document.getElementById(
-            "page-" + pageName
-        );
-
-
-    if(targetPage)
-    {
-        targetPage.classList.add("active");
-    }
-
-
-    // Update navigation buttons
-
-    const navItems =
-        document.querySelectorAll(".nav-item");
-
-
-    navItems.forEach(
-        function(item)
-        {
-            item.classList.remove("active");
-        }
-    );
-
-
-    const activeButton =
-        document.querySelector(
-            `[onclick="Navigate('${pageName}')"]`
-        );
-
-
-    if(activeButton)
-    {
-        activeButton.classList.add("active");
-    }
-
-
-    // Update topbar
-
-    if(Pages[pageName])
-    {
-        document.getElementById(
-            "pageTitle"
-        ).textContent =
-            Pages[pageName].title;
-
-
-        document.getElementById(
-            "pageEyebrow"
-        ).textContent =
-            Pages[pageName].eyebrow;
-    }
-
-
-    // Scroll content to top
-
-    const content =
-        document.getElementById("content");
-
-
-    if(content)
-    {
-        content.scrollTo(
-            {
-                top: 0,
-                behavior: "smooth"
-            }
-        );
-    }
-
-}
-
-    // Connect to API
-
-    FetchHomeData();
 //==================================================
 // RENDER CURRENTLY HOME
 //==================================================
@@ -209,17 +117,31 @@ function RenderCurrentlyHome(data)
             "presenceContainer"
         );
 
+
     const count =
         document.getElementById(
             "homeCount"
         );
 
+
     if(!container || !count)
+    {
+        console.warn(
+            "[Home Journal] Presence elements not found"
+        );
+
         return;
+    }
 
 
     const visitors =
         data.currentlyHome || [];
+
+
+    console.log(
+        "[Home Journal] Currently home:",
+        visitors.length
+    );
 
 
     count.textContent =
@@ -232,6 +154,7 @@ function RenderCurrentlyHome(data)
     {
         container.className =
             "presence-card empty";
+
 
         container.innerHTML = `
 
@@ -261,6 +184,7 @@ function RenderCurrentlyHome(data)
 
     container.className =
         "presence-card";
+
 
     let html = "";
 
@@ -310,6 +234,194 @@ function RenderCurrentlyHome(data)
     container.innerHTML =
         html;
 }
+
+
+//==================================================
+// RENDER FAVORITES
+//==================================================
+
+function RenderFavorites(data)
+{
+    const container =
+        document.getElementById(
+            "favoritesContainer"
+        );
+
+
+    if(!container)
+    {
+        console.warn(
+            "[Home Journal] Favorites container not found"
+        );
+
+        return;
+    }
+
+
+    const favorites =
+        data.favorites || [];
+
+
+    console.log(
+        "[Home Journal] Favorites:",
+        favorites.length
+    );
+
+
+    let html = "";
+
+
+    for(const favorite of favorites)
+    {
+        html += `
+
+            <div class="favorite-card">
+
+                <div class="favorite-heart">
+                    ♥
+                </div>
+
+                <h3>
+                    ${favorite}
+                </h3>
+
+                <p>
+                    Favorite visitor
+                </p>
+
+            </div>
+
+        `;
+    }
+
+
+    html += `
+
+        <button
+            class="favorite-card add-favorite"
+        >
+
+            +
+
+            <span>
+                Add Favorite
+            </span>
+
+        </button>
+
+    `;
+
+
+    container.innerHTML =
+        html;
+}
+
+
+//==================================================
+// NAVIGATION
+//==================================================
+
+function Navigate(pageName)
+{
+    console.log(
+        "[Home Journal] Navigating to:",
+        pageName
+    );
+
+
+    const pages =
+        document.querySelectorAll(
+            ".page"
+        );
+
+
+    pages.forEach(
+        function(page)
+        {
+            page.classList.remove(
+                "active"
+            );
+        }
+    );
+
+
+    const targetPage =
+        document.getElementById(
+            "page-" + pageName
+        );
+
+
+    if(targetPage)
+    {
+        targetPage.classList.add(
+            "active"
+        );
+    }
+
+
+    const navItems =
+        document.querySelectorAll(
+            ".nav-item"
+        );
+
+
+    navItems.forEach(
+        function(item)
+        {
+            item.classList.remove(
+                "active"
+            );
+        }
+    );
+
+
+    const activeButton =
+        document.querySelector(
+            `[onclick="Navigate('${pageName}')"]`
+        );
+
+
+    if(activeButton)
+    {
+        activeButton.classList.add(
+            "active"
+        );
+    }
+
+
+    if(Pages[pageName])
+    {
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            Pages[pageName].title;
+
+
+        document.getElementById(
+            "pageEyebrow"
+        ).textContent =
+            Pages[pageName].eyebrow;
+    }
+
+
+    const content =
+        document.getElementById(
+            "content"
+        );
+
+
+    if(content)
+    {
+        content.scrollTo(
+            {
+                top: 0,
+                behavior: "smooth"
+            }
+        );
+    }
+}
+
+
 //==================================================
 // CLOCK
 //==================================================
@@ -317,7 +429,9 @@ function RenderCurrentlyHome(data)
 function UpdateClock()
 {
     const clock =
-        document.getElementById("clock");
+        document.getElementById(
+            "clock"
+        );
 
 
     if(!clock)
@@ -343,7 +457,7 @@ function UpdateClock()
 // MANUAL SYNC
 //==================================================
 
-function ManualSync()
+async function ManualSync()
 {
     console.log(
         "[Home Journal] Manual synchronization requested"
@@ -356,40 +470,43 @@ function ManualSync()
         null;
 
 
+    const originalText =
+        button ?
+        button.innerHTML :
+        "";
+
+
     if(button)
     {
-        const originalText =
-            button.innerHTML;
-
-
         button.innerHTML =
             "↻ Syncing...";
 
-
         button.disabled =
             true;
+    }
+
+
+    // Get fresh data
+
+    await FetchHomeData();
+
+
+    if(button)
+    {
+        button.innerHTML =
+            "✓ Synced";
 
 
         setTimeout(
             function()
             {
                 button.innerHTML =
-                    "✓ Synced";
+                    originalText;
 
-
-                setTimeout(
-                    function()
-                    {
-                        button.innerHTML =
-                            originalText;
-
-                        button.disabled =
-                            false;
-                    },
-                    1500
-                );
+                button.disabled =
+                    false;
             },
-            900
+            1500
         );
     }
 }
@@ -418,6 +535,11 @@ function Initialize()
     );
 
 
+    // Fetch live data
+
+    FetchHomeData();
+
+
     // Start clock
 
     UpdateClock();
@@ -427,7 +549,6 @@ function Initialize()
         UpdateClock,
         1000
     );
-
 }
 
 
