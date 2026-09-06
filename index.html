@@ -45,7 +45,7 @@
                     <span class="status-dot"></span>
                     <span>SYSTEM ONLINE</span>
                 </div>
-                <div class="version">HOME JOURNAL v6.8</div>
+                <div class="version">HOME JOURNAL v6.9</div>
             </div>
         </aside>
 
@@ -76,11 +76,12 @@
                         <button class="sync-button" onclick="ManualSync()">🔄 Sync Now</button>
                     </div>
 
-                    <div class="section-header">
+                    <div class="section-header recent-header">
                         <div>
                             <div class="section-title">WHILE YOU WERE AWAY</div>
                             <div class="section-subtitle" id="awaySubtitle">Since last check</div>
                         </div>
+                        <button class="sync-button" onclick="ResetCheck()">Mark as seen</button>
                     </div>
 
                     <div class="presence-card empty" id="whileAwayContainer"></div>
@@ -160,13 +161,6 @@
                                 <p>Request a fresh system synchronization.</p>
                             </div>
                             <button class="action-button" onclick="ManualSync()">🔄 Sync Now</button>
-                        </div>
-                        <div class="setting-card">
-                            <div>
-                                <h3>Reset Check</h3>
-                                <p>Marks you as home. Does not erase visits.</p>
-                            </div>
-                            <button class="action-button" onclick="ResetCheck()">Reset Check</button>
                         </div>
                         <div class="setting-card">
                             <div>
