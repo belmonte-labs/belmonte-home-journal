@@ -199,6 +199,118 @@ function Navigate(pageName)
 
     FetchHomeData();
 //==================================================
+// RENDER CURRENTLY HOME
+//==================================================
+
+function RenderCurrentlyHome(data)
+{
+    const container =
+        document.getElementById(
+            "presenceContainer"
+        );
+
+    const count =
+        document.getElementById(
+            "homeCount"
+        );
+
+    if(!container || !count)
+        return;
+
+
+    const visitors =
+        data.currentlyHome || [];
+
+
+    count.textContent =
+        visitors.length;
+
+
+    // Nobody home
+
+    if(visitors.length === 0)
+    {
+        container.className =
+            "presence-card empty";
+
+        container.innerHTML = `
+
+            <div class="empty-icon">
+                ◌
+            </div>
+
+            <div>
+
+                <h3>
+                    Nobody is currently home
+                </h3>
+
+                <p>
+                    The residence is quiet.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    // Visitors home
+
+    container.className =
+        "presence-card";
+
+    let html = "";
+
+
+    for(const visitor of visitors)
+    {
+        const initial =
+            visitor.name
+                .charAt(0)
+                .toUpperCase();
+
+
+        html += `
+
+            <div class="activity-card">
+
+                <div class="visitor-avatar">
+                    ${initial}
+                </div>
+
+                <div class="visitor-info">
+
+                    <div class="visitor-name">
+                        ${visitor.name}
+                    </div>
+
+                    <div class="visitor-user">
+                        @${visitor.username}
+                    </div>
+
+                </div>
+
+                <div class="visit-info">
+
+                    <div class="visit-duration">
+                        🟢 HOME
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+    }
+
+
+    container.innerHTML =
+        html;
+}
+//==================================================
 // CLOCK
 //==================================================
 
