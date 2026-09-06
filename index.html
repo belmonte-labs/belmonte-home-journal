@@ -45,7 +45,7 @@
                     <span class="status-dot"></span>
                     <span>SYSTEM ONLINE</span>
                 </div>
-                <div class="version">HOME JOURNAL v6.7</div>
+                <div class="version">HOME JOURNAL v6.8</div>
             </div>
         </aside>
 
@@ -164,9 +164,16 @@
                         <div class="setting-card">
                             <div>
                                 <h3>Reset Check</h3>
-                                <p>Marks you as home. Clears While You Were Away without erasing visits.</p>
+                                <p>Marks you as home. Does not erase visits.</p>
                             </div>
                             <button class="action-button" onclick="ResetCheck()">Reset Check</button>
+                        </div>
+                        <div class="setting-card">
+                            <div>
+                                <h3>Clear Journal</h3>
+                                <p>Erase the visit history. Favorites are kept.</p>
+                            </div>
+                            <button class="action-button danger" onclick="ClearJournal()">Clear Log</button>
                         </div>
                     </div>
                 </div>
