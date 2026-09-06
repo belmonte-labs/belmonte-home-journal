@@ -136,7 +136,7 @@ function RenderCurrentlyHome(data)
     {
         container.className = "presence-card empty";
         container.innerHTML = `
-            <div class="empty-icon">◌</div>
+            <div class="empty-icon">🌙</div>
             <div>
                 <h3>Nobody is currently home</h3>
                 <p>The residence is quiet.</p>
@@ -186,7 +186,7 @@ function RenderRecentActivity(data)
     {
         container.innerHTML = `
             <div class="presence-card empty">
-                <div class="empty-icon">◌</div>
+                <div class="empty-icon">📝</div>
                 <div>
                     <h3>No recent visits</h3>
                     <p>Waiting for the next recorded activity.</p>
@@ -237,7 +237,7 @@ function RenderFavorites(data)
     {
         html += `
             <div class="favorite-card">
-                <div class="favorite-heart">♥</div>
+                <div class="favorite-heart">❤️</div>
                 <h3>${EscapeHtml(favorite)}</h3>
                 <p>Favorite visitor</p>
             </div>
@@ -308,7 +308,7 @@ async function ManualSync()
 
     if (button)
     {
-        button.innerHTML = "Syncing...";
+        button.innerHTML = "🔄 Syncing...";
         button.disabled = true;
     }
 
@@ -316,7 +316,7 @@ async function ManualSync()
 
     if (button)
     {
-        button.innerHTML = "Synced";
+        button.innerHTML = "✅ Synced";
 
         setTimeout(function ()
         {
