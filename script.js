@@ -1,562 +1,340 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6
-// SUPREME UPDATE
-// Interface + Live API
-//==================================================
-
-
-//==================================================
-// API
+// BELMONTE HOME JOURNAL v6.1
+// Home live data: presence + recent visits + favorites
 //==================================================
 
 const API_URL =
     "https://belmonte-home-journal-api.stafochervictoria.workers.dev/";
 
+const REFRESH_MS = 10000;
+const TIME_ZONE = "America/Sao_Paulo";
 
-//==================================================
-// PAGE DATA
-//==================================================
-
-const Pages =
-{
-    home:
-    {
-        title: "Home",
-        eyebrow: "BELMONTE RESIDENCE"
-    },
-
-    journal:
-    {
-        title: "Journal",
-        eyebrow: "RESIDENCE ACTIVITY LOG"
-    },
-
-    favorites:
-    {
-        title: "Favorites",
-        eyebrow: "PRIORITY VISITORS"
-    },
-
-    settings:
-    {
-        title: "Settings",
-        eyebrow: "SYSTEM CONTROL"
-    }
+const Pages = {
+    home: { title: "Home", eyebrow: "BELMONTE RESIDENCE" },
+    journal: { title: "Journal", eyebrow: "RESIDENCE ACTIVITY LOG" },
+    favorites: { title: "Favorites", eyebrow: "PRIORITY VISITORS" },
+    settings: { title: "Settings", eyebrow: "SYSTEM CONTROL" }
 };
 
+function EscapeHtml(value)
+{
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
 
-//==================================================
-// FETCH HOME DATA
-//==================================================
+function FormatDuration(seconds)
+{
+    seconds = Number(seconds) || 0;
+
+    if (seconds < 60)
+        return "< 1m";
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0)
+        return hours + "h " + minutes + "m";
+
+    return minutes + "m";
+}
+
+function FormatDateTime(unix)
+{
+    if (!unix)
+        return "";
+
+    const date = new Date(Number(unix) * 1000);
+
+    return date.toLocaleString("pt-BR", {
+        timeZone: TIME_ZONE,
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function FormatClock(date)
+{
+    return date.toLocaleTimeString("pt-BR", {
+        timeZone: TIME_ZONE,
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function GetGreeting(date)
+{
+    const hour = Number(
+        new Intl.DateTimeFormat("pt-BR", {
+            timeZone: TIME_ZONE,
+            hour: "numeric",
+            hour12: false
+        }).format(date)
+    );
+
+    if (hour < 12)
+        return "GOOD MORNING";
+
+    if (hour < 18)
+        return "GOOD AFTERNOON";
+
+    return "GOOD EVENING";
+}
+
+function GetInitial(name)
+{
+    const clean = String(name || "").trim();
+    return clean ? clean.charAt(0).toUpperCase() : "?";
+}
 
 async function FetchHomeData()
 {
     try
     {
-        console.log(
-            "[Home Journal] Fetching live data..."
-        );
+        console.log("[Home Journal] Fetching live data...");
 
+        const response = await fetch(API_URL);
 
-        const response =
-            await fetch(API_URL);
+        if (!response.ok)
+            throw new Error("API response: " + response.status);
 
+        const data = await response.json();
 
-        if(!response.ok)
-        {
-            throw new Error(
-                "API response: "
-                +
-                response.status
-            );
-        }
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "[Home Journal] API connected:"
-        );
-
-        console.log(data);
-
-
-        // Render live data
+        console.log("[Home Journal] API connected:", data);
 
         RenderCurrentlyHome(data);
-
+        RenderRecentActivity(data);
         RenderFavorites(data);
-
 
         return data;
     }
-
-
-    catch(error)
+    catch (error)
     {
-        console.error(
-            "[Home Journal] API error:",
-            error
-        );
-
+        console.error("[Home Journal] API error:", error);
         return null;
     }
 }
 
-
-//==================================================
-// RENDER CURRENTLY HOME
-//==================================================
-
 function RenderCurrentlyHome(data)
 {
-    const container =
-        document.getElementById(
-            "presenceContainer"
-        );
+    const container = document.getElementById("presenceContainer");
+    const count = document.getElementById("homeCount");
 
-
-    const count =
-        document.getElementById(
-            "homeCount"
-        );
-
-
-    if(!container || !count)
-    {
-        console.warn(
-            "[Home Journal] Presence elements not found"
-        );
-
+    if (!container || !count)
         return;
-    }
 
+    const visitors = data.currentlyHome || [];
+    count.textContent = visitors.length;
 
-    const visitors =
-        data.currentlyHome || [];
-
-
-    console.log(
-        "[Home Journal] Currently home:",
-        visitors.length
-    );
-
-
-    count.textContent =
-        visitors.length;
-
-
-    // Nobody home
-
-    if(visitors.length === 0)
+    if (visitors.length === 0)
     {
-        container.className =
-            "presence-card empty";
-
-
+        container.className = "presence-card empty";
         container.innerHTML = `
-
-            <div class="empty-icon">
-                ◌
-            </div>
-
+            <div class="empty-icon">◌</div>
             <div>
-
-                <h3>
-                    Nobody is currently home
-                </h3>
-
-                <p>
-                    The residence is quiet.
-                </p>
-
+                <h3>Nobody is currently home</h3>
+                <p>The residence is quiet.</p>
             </div>
-
         `;
-
         return;
     }
 
-
-    // Visitors home
-
-    container.className =
-        "presence-card";
-
+    container.className = "activity-list";
 
     let html = "";
 
-
-    for(const visitor of visitors)
+    for (const visitor of visitors)
     {
-        const initial =
-            visitor.name
-                .charAt(0)
-                .toUpperCase();
-
+        const name = EscapeHtml(visitor.name);
+        const username = EscapeHtml(visitor.username);
+        const since = FormatDateTime(visitor.enterTime);
 
         html += `
-
             <div class="activity-card">
-
-                <div class="visitor-avatar">
-                    ${initial}
-                </div>
-
+                <div class="visitor-avatar">${EscapeHtml(GetInitial(visitor.name))}</div>
                 <div class="visitor-info">
-
-                    <div class="visitor-name">
-                        ${visitor.name}
-                    </div>
-
-                    <div class="visitor-user">
-                        @${visitor.username}
-                    </div>
-
+                    <div class="visitor-name">${name}</div>
+                    <div class="visitor-user">@${username}</div>
                 </div>
-
                 <div class="visit-info">
-
-                    <div class="visit-duration">
-                        🟢 HOME
-                    </div>
-
+                    <div class="visit-duration">HOME</div>
+                    <div class="visit-date">${since}</div>
                 </div>
-
             </div>
-
         `;
     }
 
-
-    container.innerHTML =
-        html;
+    container.innerHTML = html;
 }
 
+function RenderRecentActivity(data)
+{
+    const container = document.getElementById("activityContainer");
 
-//==================================================
-// RENDER FAVORITES
-//==================================================
+    if (!container)
+        return;
+
+    const visits = (data.recentVisits || []).slice().reverse();
+
+    if (visits.length === 0)
+    {
+        container.innerHTML = `
+            <div class="presence-card empty">
+                <div class="empty-icon">◌</div>
+                <div>
+                    <h3>No recent visits</h3>
+                    <p>Waiting for the next recorded activity.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    let html = "";
+
+    for (const visit of visits)
+    {
+        const name = EscapeHtml(visit.name);
+        const username = EscapeHtml(visit.username);
+        const duration = FormatDuration(visit.duration);
+        const when = FormatDateTime(visit.leaveTime || visit.enterTime);
+
+        html += `
+            <div class="activity-card">
+                <div class="visitor-avatar">${EscapeHtml(GetInitial(visit.name))}</div>
+                <div class="visitor-info">
+                    <div class="visitor-name">${name}</div>
+                    <div class="visitor-user">@${username}</div>
+                </div>
+                <div class="visit-info">
+                    <div class="visit-duration">${duration}</div>
+                    <div class="visit-date">${when}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+}
 
 function RenderFavorites(data)
 {
-    const container =
-        document.getElementById(
-            "favoritesContainer"
-        );
+    const container = document.getElementById("favoritesContainer");
 
-
-    if(!container)
-    {
-        console.warn(
-            "[Home Journal] Favorites container not found"
-        );
-
+    if (!container)
         return;
-    }
 
-
-    const favorites =
-        data.favorites || [];
-
-
-    console.log(
-        "[Home Journal] Favorites:",
-        favorites.length
-    );
-
-
+    const favorites = data.favorites || [];
     let html = "";
 
-
-    for(const favorite of favorites)
+    for (const favorite of favorites)
     {
         html += `
-
             <div class="favorite-card">
-
-                <div class="favorite-heart">
-                    ♥
-                </div>
-
-                <h3>
-                    ${favorite}
-                </h3>
-
-                <p>
-                    Favorite visitor
-                </p>
-
+                <div class="favorite-heart">♥</div>
+                <h3>${EscapeHtml(favorite)}</h3>
+                <p>Favorite visitor</p>
             </div>
-
         `;
     }
 
-
     html += `
-
-        <button
-            class="favorite-card add-favorite"
-        >
-
+        <button class="favorite-card add-favorite">
             +
-
-            <span>
-                Add Favorite
-            </span>
-
+            <span>Add Favorite</span>
         </button>
-
     `;
 
-
-    container.innerHTML =
-        html;
+    container.innerHTML = html;
 }
-
-
-//==================================================
-// NAVIGATION
-//==================================================
 
 function Navigate(pageName)
 {
-    console.log(
-        "[Home Journal] Navigating to:",
-        pageName
-    );
-
-
-    const pages =
-        document.querySelectorAll(
-            ".page"
-        );
-
-
-    pages.forEach(
-        function(page)
-        {
-            page.classList.remove(
-                "active"
-            );
-        }
-    );
-
-
-    const targetPage =
-        document.getElementById(
-            "page-" + pageName
-        );
-
-
-    if(targetPage)
+    document.querySelectorAll(".page").forEach(function (page)
     {
-        targetPage.classList.add(
-            "active"
-        );
+        page.classList.remove("active");
+    });
+
+    const targetPage = document.getElementById("page-" + pageName);
+    if (targetPage)
+        targetPage.classList.add("active");
+
+    document.querySelectorAll(".nav-item").forEach(function (item)
+    {
+        item.classList.remove("active");
+    });
+
+    const activeButton = document.querySelector(`[onclick="Navigate('${pageName}')"]`);
+    if (activeButton)
+        activeButton.classList.add("active");
+
+    if (Pages[pageName])
+    {
+        document.getElementById("pageTitle").textContent = Pages[pageName].title;
+        document.getElementById("pageEyebrow").textContent = Pages[pageName].eyebrow;
     }
 
-
-    const navItems =
-        document.querySelectorAll(
-            ".nav-item"
-        );
-
-
-    navItems.forEach(
-        function(item)
-        {
-            item.classList.remove(
-                "active"
-            );
-        }
-    );
-
-
-    const activeButton =
-        document.querySelector(
-            `[onclick="Navigate('${pageName}')"]`
-        );
-
-
-    if(activeButton)
-    {
-        activeButton.classList.add(
-            "active"
-        );
-    }
-
-
-    if(Pages[pageName])
-    {
-        document.getElementById(
-            "pageTitle"
-        ).textContent =
-            Pages[pageName].title;
-
-
-        document.getElementById(
-            "pageEyebrow"
-        ).textContent =
-            Pages[pageName].eyebrow;
-    }
-
-
-    const content =
-        document.getElementById(
-            "content"
-        );
-
-
-    if(content)
-    {
-        content.scrollTo(
-            {
-                top: 0,
-                behavior: "smooth"
-            }
-        );
-    }
+    const content = document.getElementById("content");
+    if (content)
+        content.scrollTo({ top: 0, behavior: "smooth" });
 }
-
-
-//==================================================
-// CLOCK
-//==================================================
 
 function UpdateClock()
 {
-    const clock =
-        document.getElementById(
-            "clock"
-        );
+    const now = new Date();
+    const clock = document.getElementById("clock");
+    const greeting = document.getElementById("welcomeSmall");
 
+    if (clock)
+        clock.textContent = FormatClock(now);
 
-    if(!clock)
-        return;
-
-
-    const now =
-        new Date();
-
-
-    clock.textContent =
-        now.toLocaleTimeString(
-            [],
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
+    if (greeting)
+        greeting.textContent = GetGreeting(now);
 }
-
-
-//==================================================
-// MANUAL SYNC
-//==================================================
 
 async function ManualSync()
 {
-    console.log(
-        "[Home Journal] Manual synchronization requested"
-    );
+    const button = (typeof event !== "undefined" && event.currentTarget)
+        ? event.currentTarget
+        : null;
 
+    const originalText = button ? button.innerHTML : "";
 
-    const button =
-        event ?
-        event.currentTarget :
-        null;
-
-
-    const originalText =
-        button ?
-        button.innerHTML :
-        "";
-
-
-    if(button)
+    if (button)
     {
-        button.innerHTML =
-            "↻ Syncing...";
-
-        button.disabled =
-            true;
+        button.innerHTML = "Syncing...";
+        button.disabled = true;
     }
-
-
-    // Get fresh data
 
     await FetchHomeData();
 
-
-    if(button)
+    if (button)
     {
-        button.innerHTML =
-            "✓ Synced";
+        button.innerHTML = "Synced";
 
-
-        setTimeout(
-            function()
-            {
-                button.innerHTML =
-                    originalText;
-
-                button.disabled =
-                    false;
-            },
-            1500
-        );
+        setTimeout(function ()
+        {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 1200);
     }
 }
 
-
-//==================================================
-// INITIALIZE
-//==================================================
-
 function Initialize()
 {
-    console.log(
-        "================================="
-    );
-
-    console.log(
-        "BELMONTE HOME JOURNAL v6"
-    );
-
-    console.log(
-        "SUPREME UPDATE INITIALIZED"
-    );
-
-    console.log(
-        "================================="
-    );
-
-
-    // Fetch live data
+    console.log("BELMONTE HOME JOURNAL v6.1");
 
     FetchHomeData();
-
-
-    // Start clock
-
     UpdateClock();
 
-
-    setInterval(
-        UpdateClock,
-        1000
-    );
+    setInterval(UpdateClock, 1000);
+    setInterval(FetchHomeData, REFRESH_MS);
 }
 
-
-//==================================================
-// START
-//==================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    Initialize
-);
+document.addEventListener("DOMContentLoaded", Initialize);
