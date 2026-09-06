@@ -1,8 +1,3 @@
-//==================================================
-// BELMONTE HOME JOURNAL v6.9
-// Mark as seen on Home
-//==================================================
-
 const API_URL =
     "https://belmonte-home-journal-api.stafochervictoria.workers.dev/";
 
@@ -11,10 +6,10 @@ const TIME_ZONE = "America/Sao_Paulo";
 const HOME_ACTIVITY_LIMIT = 10;
 
 const Pages = {
-    home: { title: "Home", eyebrow: "BELMONTE RESIDENCE" },
-    journal: { title: "Journal", eyebrow: "RESIDENCE ACTIVITY LOG" },
-    favorites: { title: "Favorites", eyebrow: "PRIORITY VISITORS" },
-    settings: { title: "Settings", eyebrow: "SYSTEM CONTROL" }
+    home: { eyebrow: "BELMONTE RESIDENCE" },
+    journal: { eyebrow: "RESIDENCE JOURNAL" },
+    favorites: { eyebrow: "THE HOUSE RECOGNIZES" },
+    settings: { eyebrow: "SYSTEM" }
 };
 
 let journalVisits = [];
@@ -112,21 +107,16 @@ function GetInitial(name)
 
 function VisitCard(visit)
 {
-    const name = EscapeHtml(visit.name);
-    const username = EscapeHtml(visit.username);
-    const duration = FormatDuration(visit.duration);
-    const when = FormatDateTime(visit.leaveTime || visit.enterTime);
-
     return `
         <div class="activity-card">
             <div class="visitor-avatar">${EscapeHtml(GetInitial(visit.name))}</div>
             <div class="visitor-info">
-                <div class="visitor-name">${name}</div>
-                <div class="visitor-user">@${username}</div>
+                <div class="visitor-name">${EscapeHtml(visit.name)}</div>
+                <div class="visitor-user">@${EscapeHtml(visit.username)}</div>
             </div>
             <div class="visit-info">
-                <div class="visit-duration">${duration}</div>
-                <div class="visit-date">${when}</div>
+                <div class="visit-duration">${FormatDuration(visit.duration)}</div>
+                <div class="visit-date">${FormatDateTime(visit.leaveTime || visit.enterTime)}</div>
             </div>
         </div>
     `;
@@ -223,8 +213,8 @@ function RenderWhileAway(data)
     {
         container.className = "presence-card empty";
         container.innerHTML = EmptyState(
-            "🏡",
-            "Your home has been quiet.",
+            "·",
+            "The house is still.",
             "No visitors while you were away."
         );
         return;
@@ -292,9 +282,9 @@ function RenderCurrentlyHome(data)
     {
         container.className = "presence-card empty";
         container.innerHTML = EmptyState(
-            "🌙",
-            "Nobody is currently home",
-            "The residence is quiet."
+            "·",
+            "No one is home.",
+            "The rooms are quiet."
         );
         return;
     }
@@ -335,9 +325,9 @@ function RenderRecentActivity()
     if (visits.length === 0)
     {
         container.innerHTML = EmptyState(
-            "📝",
-            "No recent visits",
-            "Waiting for the next recorded activity."
+            "·",
+            "No recent footsteps.",
+            "Waiting for the next visit."
         );
         return;
     }
@@ -379,9 +369,9 @@ function RenderJournal()
     if (journalVisits.length === 0)
     {
         container.innerHTML = EmptyState(
-            "📖",
-            "No visits recorded yet",
-            "Your visit history will appear here."
+            "·",
+            "The book is empty.",
+            "Visits will collect here."
         );
         return;
     }
@@ -389,9 +379,9 @@ function RenderJournal()
     if (visits.length === 0)
     {
         container.innerHTML = EmptyState(
-            "🔍",
-            "No matching visitors",
-            "Try another name or username."
+            "·",
+            "No one by that name.",
+            "Try another."
         );
         return;
     }
@@ -407,29 +397,31 @@ function RenderFavorites(data)
         return;
 
     const favorites = data.favorites || [];
-    let html = "";
 
     if (favorites.length === 0)
     {
-        html = EmptyState(
-            "❤️",
-            "No favorites yet",
-            "Use the field above to add one."
+        container.innerHTML = EmptyState(
+            "♥",
+            "No favorites yet.",
+            "Mark someone the house should recognize."
         );
+        return;
     }
-    else
+
+    let html = "";
+
+    for (let i = 0; i < favorites.length; i++)
     {
-        for (let i = 0; i < favorites.length; i++)
-        {
-            html += `
-                <div class="favorite-card">
-                    <div class="favorite-heart">❤️</div>
-                    <h3>${EscapeHtml(favorites[i])}</h3>
-                    <p>Favorite visitor</p>
-                    <button class="text-button" onclick="RemoveFavoriteAt(${i})">Remove</button>
+        html += `
+            <div class="activity-card">
+                <div class="favorite-mark">♥</div>
+                <div class="visitor-info">
+                    <div class="visitor-name">${EscapeHtml(favorites[i])}</div>
+                    <div class="visitor-user">Recognized by the house</div>
                 </div>
-            `;
-        }
+                <button class="text-button" onclick="RemoveFavoriteAt(${i})">Remove</button>
+            </div>
+        `;
     }
 
     container.innerHTML = html;
@@ -560,10 +552,7 @@ function Navigate(pageName)
         activeButton.classList.add("active");
 
     if (Pages[pageName])
-    {
-        document.getElementById("pageTitle").textContent = Pages[pageName].title;
         document.getElementById("pageEyebrow").textContent = Pages[pageName].eyebrow;
-    }
 
     const content = document.getElementById("content");
     if (content)
@@ -593,7 +582,7 @@ async function ManualSync()
 
     if (button)
     {
-        button.innerHTML = "🔄 Syncing...";
+        button.innerHTML = "Syncing...";
         button.disabled = true;
     }
 
@@ -601,7 +590,7 @@ async function ManualSync()
 
     if (button)
     {
-        button.innerHTML = "✅ Synced";
+        button.innerHTML = "Synced";
 
         setTimeout(function ()
         {
@@ -613,11 +602,8 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.9");
-
     FetchHomeData();
     UpdateClock();
-
     setInterval(UpdateClock, 1000);
     setInterval(FetchHomeData, REFRESH_MS);
 }
