@@ -197,6 +197,7 @@ function RenderWhileAway(data)
 
     let lastChecked = Number(data.lastChecked) || 0;
     const visits = data.recentVisits || [];
+    const current = data.currentlyHome || [];
 
     if (lastChecked === 0)
         lastChecked = Math.floor(Date.now() / 1000) - 86400;
@@ -204,44 +205,106 @@ function RenderWhileAway(data)
     if (subtitle)
         subtitle.textContent = "Since " + FormatDateTime(lastChecked);
 
-    const awayVisits = visits.filter(function (visit)
+    const finished = visits.filter(function (visit)
     {
         return Number(visit.leaveTime) > lastChecked;
     });
 
-    if (awayVisits.length === 0)
+    const stillHere = current.filter(function (visitor)
+    {
+        return Number(visitor.enterTime) > lastChecked;
+    });
+
+    if (finished.length === 0 && stillHere.length === 0)
     {
         container.className = "presence-card empty";
-        container.innerHTML = EmptyState(
-            "·",
-            "The house is still.",
-            "No visitors while you were away."
-        );
+
+        if (current.length >= 3)
+        {
+            container.innerHTML = EmptyState(
+                "·",
+                "The house is full.",
+                "No new visitors since last check."
+            );
+        }
+        else if (current.length > 0)
+        {
+            container.innerHTML = EmptyState(
+                "·",
+                "People are home.",
+                "No new visitors since last check."
+            );
+        }
+        else
+        {
+            container.innerHTML = EmptyState(
+                "·",
+                "The house is still.",
+                "No visitors while you were away."
+            );
+        }
         return;
     }
 
     const unique = [];
-    let lastVisit = awayVisits[0];
+    let lastVisit = null;
+    let people = "";
+    const seen = [];
+    let i;
 
-    for (const visit of awayVisits)
+    for (i = 0; i < finished.length; i++)
     {
+        const visit = finished[i];
         const key = String(visit.username || visit.name);
+
         if (unique.indexOf(key) === -1)
             unique.push(key);
 
-        if (Number(visit.leaveTime) >= Number(lastVisit.leaveTime))
+        if (!lastVisit || Number(visit.leaveTime) >= Number(lastVisit.leaveTime || lastVisit.enterTime))
             lastVisit = visit;
     }
 
-    let people = "";
-    const seen = [];
-
-    for (const visit of awayVisits)
+    for (i = 0; i < stillHere.length; i++)
     {
+        const visitor = stillHere[i];
+        const key = String(visitor.username || visitor.name);
+
+        if (unique.indexOf(key) === -1)
+            unique.push(key);
+
+        if (!lastVisit || Number(visitor.enterTime) >= Number(lastVisit.leaveTime || lastVisit.enterTime))
+            lastVisit = visitor;
+    }
+
+    for (i = 0; i < stillHere.length; i++)
+    {
+        const visitor = stillHere[i];
+        const key = String(visitor.username || visitor.name);
+        if (seen.indexOf(key) !== -1)
+            continue;
+        seen.push(key);
+
+        people += `
+            <div class="activity-card">
+                <div class="visitor-avatar">${EscapeHtml(GetInitial(visitor.name))}</div>
+                <div class="visitor-info">
+                    <div class="visitor-name">${EscapeHtml(visitor.name)}</div>
+                    <div class="visitor-user">@${EscapeHtml(visitor.username)}</div>
+                </div>
+                <div class="visit-info">
+                    <div class="visit-duration">HOME</div>
+                    <div class="visit-date">${FormatDateTime(visitor.enterTime)}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    for (i = 0; i < finished.length; i++)
+    {
+        const visit = finished[i];
         const key = String(visit.username || visit.name);
         if (seen.indexOf(key) !== -1)
             continue;
-
         seen.push(key);
 
         people += `
@@ -255,12 +318,15 @@ function RenderWhileAway(data)
         `;
     }
 
+    const lastName = lastVisit ? lastVisit.name : "";
+    const lastUser = lastVisit ? lastVisit.username : "";
+
     container.className = "activity-list";
     container.innerHTML = `
         <div class="presence-card">
             <div>
-                <h3>Visits: ${awayVisits.length} · Unique: ${unique.length}</h3>
-                <p>Last visitor: ${EscapeHtml(lastVisit.name)} (@${EscapeHtml(lastVisit.username)}) · ${FormatDuration(lastVisit.duration)}</p>
+                <h3>Updates: ${finished.length + stillHere.length} · Unique: ${unique.length}</h3>
+                <p>Latest: ${EscapeHtml(lastName)} (@${EscapeHtml(lastUser)})</p>
             </div>
         </div>
         ${people}
