@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.8
-// Clear Log from the screen
+// BELMONTE HOME JOURNAL v6.9
+// Mark as seen on Home
 //==================================================
 
 const API_URL =
@@ -511,7 +511,6 @@ async function ResetCheck()
     try
     {
         await PushState();
-        Navigate("home");
     }
     catch (error)
     {
@@ -614,7 +613,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.8");
+    console.log("BELMONTE HOME JOURNAL v6.9");
 
     FetchHomeData();
     UpdateClock();
