@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.5
-// Add + Remove Favorite on prim
+// BELMONTE HOME JOURNAL v6.6
+// While Away + Journal up to 50 + Home shows 10
 //==================================================
 
 const API_URL =
@@ -8,6 +8,7 @@ const API_URL =
 
 const REFRESH_MS = 10000;
 const TIME_ZONE = "America/Sao_Paulo";
+const HOME_ACTIVITY_LIMIT = 10;
 
 const Pages = {
     home: { title: "Home", eyebrow: "BELMONTE RESIDENCE" },
@@ -157,6 +158,7 @@ async function FetchHomeData()
         lastData = data;
         journalVisits = (data.recentVisits || []).slice().reverse();
 
+        RenderWhileAway(data);
         RenderCurrentlyHome(data);
         RenderRecentActivity();
         RenderJournal();
@@ -191,6 +193,83 @@ async function PushState()
 
     if (!response.ok)
         throw new Error("API response: " + response.status);
+}
+
+function RenderWhileAway(data)
+{
+    const container = document.getElementById("whileAwayContainer");
+    const subtitle = document.getElementById("awaySubtitle");
+
+    if (!container)
+        return;
+
+    let lastChecked = Number(data.lastChecked) || 0;
+    const visits = data.recentVisits || [];
+
+    if (lastChecked === 0)
+        lastChecked = Math.floor(Date.now() / 1000) - 86400;
+
+    if (subtitle)
+        subtitle.textContent = "Since " + FormatDateTime(lastChecked);
+
+    const awayVisits = visits.filter(function (visit)
+    {
+        return Number(visit.leaveTime) > lastChecked;
+    });
+
+    if (awayVisits.length === 0)
+    {
+        container.className = "presence-card empty";
+        container.innerHTML = EmptyState(
+            "🏡",
+            "Your home has been quiet.",
+            "No visitors while you were away."
+        );
+        return;
+    }
+
+    const unique = [];
+    let lastVisit = awayVisits[0];
+
+    for (const visit of awayVisits)
+    {
+        const key = String(visit.username || visit.name);
+        if (unique.indexOf(key) === -1)
+            unique.push(key);
+
+        if (Number(visit.leaveTime) >= Number(lastVisit.leaveTime))
+            lastVisit = visit;
+    }
+
+    let people = "";
+
+    for (const visit of awayVisits)
+    {
+        const key = String(visit.username || visit.name);
+        if (people.indexOf("@" + EscapeHtml(visit.username)) !== -1)
+            continue;
+
+        people += `
+            <div class="activity-card">
+                <div class="visitor-avatar">${EscapeHtml(GetInitial(visit.name))}</div>
+                <div class="visitor-info">
+                    <div class="visitor-name">${EscapeHtml(visit.name)}</div>
+                    <div class="visitor-user">@${EscapeHtml(visit.username)}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    container.className = "activity-list";
+    container.innerHTML = `
+        <div class="presence-card">
+            <div>
+                <h3>Visits: ${awayVisits.length} · Unique: ${unique.length}</h3>
+                <p>Last visitor: ${EscapeHtml(lastVisit.name)} (@${EscapeHtml(lastVisit.username)}) · ${FormatDuration(lastVisit.duration)}</p>
+            </div>
+        </div>
+        ${people}
+    `;
 }
 
 function RenderCurrentlyHome(data)
@@ -246,7 +325,7 @@ function RenderRecentActivity()
     if (!container)
         return;
 
-    const visits = journalVisits.slice(0, 10);
+    const visits = journalVisits.slice(0, HOME_ACTIVITY_LIMIT);
 
     if (visits.length === 0)
     {
@@ -493,7 +572,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.5");
+    console.log("BELMONTE HOME JOURNAL v6.6");
 
     FetchHomeData();
     UpdateClock();
