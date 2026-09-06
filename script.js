@@ -222,7 +222,7 @@ function RenderWhileAway(data)
         if (current.length >= 3)
         {
             container.innerHTML = EmptyState(
-                "·",
+                String(current.length),
                 "The house is full.",
                 "No new visitors since last check."
             );
@@ -230,7 +230,7 @@ function RenderWhileAway(data)
         else if (current.length > 0)
         {
             container.innerHTML = EmptyState(
-                "·",
+                String(current.length),
                 "People are home.",
                 "No new visitors since last check."
             );
@@ -324,6 +324,7 @@ function RenderWhileAway(data)
     container.className = "activity-list";
     container.innerHTML = `
         <div class="presence-card">
+            <div class="empty-icon">!</div>
             <div>
                 <h3>Updates: ${finished.length + stillHere.length} · Unique: ${unique.length}</h3>
                 <p>Latest: ${EscapeHtml(lastName)} (@${EscapeHtml(lastUser)})</p>
