@@ -7,9 +7,9 @@ const HOME_ACTIVITY_LIMIT = 10;
 
 const Pages = {
     home: { eyebrow: "BELMONTE RESIDENCE" },
-    journal: { eyebrow: "RESIDENCE JOURNAL" },
-    favorites: { eyebrow: "THE HOUSE RECOGNIZES" },
-    settings: { eyebrow: "SYSTEM" }
+    journal: { eyebrow: "JOURNAL" },
+    favorites: { eyebrow: "FAVORITES" },
+    settings: { eyebrow: "SETTINGS" }
 };
 
 let journalVisits = [];
