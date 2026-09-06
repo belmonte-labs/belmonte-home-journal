@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.3
-// Home + Journal + Add Favorite
+// BELMONTE HOME JOURNAL v6.4
+// Add Favorite works on prim (no prompt)
 //==================================================
 
 const API_URL =
@@ -32,6 +32,13 @@ function EscapeHtml(value)
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
+}
+
+function SetFavStatus(text)
+{
+    const el = document.getElementById("favStatus");
+    if (el)
+        el.textContent = text;
 }
 
 function FormatDuration(seconds)
@@ -318,38 +325,41 @@ function RenderFavorites(data)
     const favorites = data.favorites || [];
     let html = "";
 
-    for (const favorite of favorites)
+    if (favorites.length === 0)
     {
-        html += `
-            <div class="favorite-card">
-                <div class="favorite-heart">❤️</div>
-                <h3>${EscapeHtml(favorite)}</h3>
-                <p>Favorite visitor</p>
-            </div>
-        `;
+        html = EmptyState(
+            "❤️",
+            "No favorites yet",
+            "Use the field above to add one."
+        );
     }
-
-    html += `
-        <button class="favorite-card add-favorite" onclick="AddFavorite()">
-            +
-            <span>Add Favorite</span>
-        </button>
-    `;
+    else
+    {
+        for (const favorite of favorites)
+        {
+            html += `
+                <div class="favorite-card">
+                    <div class="favorite-heart">❤️</div>
+                    <h3>${EscapeHtml(favorite)}</h3>
+                    <p>Favorite visitor</p>
+                </div>
+            `;
+        }
+    }
 
     container.innerHTML = html;
 }
 
 async function AddFavorite()
 {
-    const typed = prompt("Type the display name or username to add as favorite:");
-
-    if (typed === null)
-        return;
-
-    const fav = typed.trim();
+    const input = document.getElementById("favNameInput");
+    const fav = input ? input.value.trim() : "";
 
     if (!fav)
+    {
+        SetFavStatus("Type a display name or username first.");
         return;
+    }
 
     const current = lastData.favorites || [];
     const exists = current.some(function (item)
@@ -359,21 +369,26 @@ async function AddFavorite()
 
     if (exists)
     {
-        alert("Favorite already exists: " + fav);
+        SetFavStatus("Already saved: " + fav);
         return;
     }
 
     lastData.favorites = current.concat([fav]);
     RenderFavorites(lastData);
+    SetFavStatus("Added: " + fav);
+
+    if (input)
+        input.value = "";
 
     try
     {
         await PushState();
+        SetFavStatus("Saved: " + fav);
     }
     catch (error)
     {
         console.error("[Home Journal] Add Favorite error:", error);
-        alert("Could not save favorite to the API.");
+        SetFavStatus("Could not save. Try again.");
     }
 }
 
@@ -451,7 +466,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.3");
+    console.log("BELMONTE HOME JOURNAL v6.4");
 
     FetchHomeData();
     UpdateClock();
