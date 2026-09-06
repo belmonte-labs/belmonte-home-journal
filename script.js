@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.1
-// Home live data: presence + recent visits + favorites
+// BELMONTE HOME JOURNAL v6.2
+// Home + Journal live data
 //==================================================
 
 const API_URL =
@@ -15,6 +15,8 @@ const Pages = {
     favorites: { title: "Favorites", eyebrow: "PRIORITY VISITORS" },
     settings: { title: "Settings", eyebrow: "SYSTEM CONTROL" }
 };
+
+let journalVisits = [];
 
 function EscapeHtml(value)
 {
@@ -93,6 +95,41 @@ function GetInitial(name)
     return clean ? clean.charAt(0).toUpperCase() : "?";
 }
 
+function VisitCard(visit)
+{
+    const name = EscapeHtml(visit.name);
+    const username = EscapeHtml(visit.username);
+    const duration = FormatDuration(visit.duration);
+    const when = FormatDateTime(visit.leaveTime || visit.enterTime);
+
+    return `
+        <div class="activity-card">
+            <div class="visitor-avatar">${EscapeHtml(GetInitial(visit.name))}</div>
+            <div class="visitor-info">
+                <div class="visitor-name">${name}</div>
+                <div class="visitor-user">@${username}</div>
+            </div>
+            <div class="visit-info">
+                <div class="visit-duration">${duration}</div>
+                <div class="visit-date">${when}</div>
+            </div>
+        </div>
+    `;
+}
+
+function EmptyState(icon, title, text)
+{
+    return `
+        <div class="presence-card empty">
+            <div class="empty-icon">${icon}</div>
+            <div>
+                <h3>${title}</h3>
+                <p>${text}</p>
+            </div>
+        </div>
+    `;
+}
+
 async function FetchHomeData()
 {
     try
@@ -108,8 +145,11 @@ async function FetchHomeData()
 
         console.log("[Home Journal] API connected:", data);
 
+        journalVisits = (data.recentVisits || []).slice().reverse();
+
         RenderCurrentlyHome(data);
-        RenderRecentActivity(data);
+        RenderRecentActivity();
+        RenderJournal();
         RenderFavorites(data);
 
         return data;
@@ -135,13 +175,11 @@ function RenderCurrentlyHome(data)
     if (visitors.length === 0)
     {
         container.className = "presence-card empty";
-        container.innerHTML = `
-            <div class="empty-icon">🌙</div>
-            <div>
-                <h3>Nobody is currently home</h3>
-                <p>The residence is quiet.</p>
-            </div>
-        `;
+        container.innerHTML = EmptyState(
+            "🌙",
+            "Nobody is currently home",
+            "The residence is quiet."
+        );
         return;
     }
 
@@ -151,20 +189,16 @@ function RenderCurrentlyHome(data)
 
     for (const visitor of visitors)
     {
-        const name = EscapeHtml(visitor.name);
-        const username = EscapeHtml(visitor.username);
-        const since = FormatDateTime(visitor.enterTime);
-
         html += `
             <div class="activity-card">
                 <div class="visitor-avatar">${EscapeHtml(GetInitial(visitor.name))}</div>
                 <div class="visitor-info">
-                    <div class="visitor-name">${name}</div>
-                    <div class="visitor-user">@${username}</div>
+                    <div class="visitor-name">${EscapeHtml(visitor.name)}</div>
+                    <div class="visitor-user">@${EscapeHtml(visitor.username)}</div>
                 </div>
                 <div class="visit-info">
                     <div class="visit-duration">HOME</div>
-                    <div class="visit-date">${since}</div>
+                    <div class="visit-date">${FormatDateTime(visitor.enterTime)}</div>
                 </div>
             </div>
         `;
@@ -173,54 +207,80 @@ function RenderCurrentlyHome(data)
     container.innerHTML = html;
 }
 
-function RenderRecentActivity(data)
+function RenderRecentActivity()
 {
     const container = document.getElementById("activityContainer");
 
     if (!container)
         return;
 
-    const visits = (data.recentVisits || []).slice().reverse();
+    const visits = journalVisits.slice(0, 10);
 
     if (visits.length === 0)
     {
-        container.innerHTML = `
-            <div class="presence-card empty">
-                <div class="empty-icon">📝</div>
-                <div>
-                    <h3>No recent visits</h3>
-                    <p>Waiting for the next recorded activity.</p>
-                </div>
-            </div>
-        `;
+        container.innerHTML = EmptyState(
+            "📝",
+            "No recent visits",
+            "Waiting for the next recorded activity."
+        );
         return;
     }
 
-    let html = "";
+    container.innerHTML = visits.map(VisitCard).join("");
+}
 
-    for (const visit of visits)
+function GetJournalQuery()
+{
+    const input = document.getElementById("journalSearch");
+    return input ? input.value.trim().toLowerCase() : "";
+}
+
+function FilterJournal()
+{
+    RenderJournal();
+}
+
+function RenderJournal()
+{
+    const container = document.getElementById("journalContainer");
+
+    if (!container)
+        return;
+
+    const query = GetJournalQuery();
+
+    const visits = journalVisits.filter(function (visit)
     {
-        const name = EscapeHtml(visit.name);
-        const username = EscapeHtml(visit.username);
-        const duration = FormatDuration(visit.duration);
-        const when = FormatDateTime(visit.leaveTime || visit.enterTime);
+        if (!query)
+            return true;
 
-        html += `
-            <div class="activity-card">
-                <div class="visitor-avatar">${EscapeHtml(GetInitial(visit.name))}</div>
-                <div class="visitor-info">
-                    <div class="visitor-name">${name}</div>
-                    <div class="visitor-user">@${username}</div>
-                </div>
-                <div class="visit-info">
-                    <div class="visit-duration">${duration}</div>
-                    <div class="visit-date">${when}</div>
-                </div>
-            </div>
-        `;
+        const name = String(visit.name || "").toLowerCase();
+        const username = String(visit.username || "").toLowerCase();
+
+        return name.includes(query) || username.includes(query);
+    });
+
+    if (journalVisits.length === 0)
+    {
+        container.innerHTML = EmptyState(
+            "📖",
+            "No visits recorded yet",
+            "Your visit history will appear here."
+        );
+        return;
     }
 
-    container.innerHTML = html;
+    if (visits.length === 0)
+    {
+        container.innerHTML = EmptyState(
+            "🔍",
+            "No matching visitors",
+            "Try another name or username."
+        );
+        return;
+    }
+
+    container.innerHTML = visits.map(VisitCard).join("");
 }
 
 function RenderFavorites(data)
@@ -328,7 +388,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.1");
+    console.log("BELMONTE HOME JOURNAL v6.2");
 
     FetchHomeData();
     UpdateClock();
