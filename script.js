@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.7
-// Reset Check from the screen
+// BELMONTE HOME JOURNAL v6.8
+// Clear Log from the screen
 //==================================================
 
 const API_URL =
@@ -22,7 +22,8 @@ let lastData = {
     currentlyHome: [],
     recentVisits: [],
     favorites: [],
-    lastChecked: 0
+    lastChecked: 0,
+    logClearedAt: 0
 };
 
 function EscapeHtml(value)
@@ -181,7 +182,8 @@ async function PushState()
             currentlyHome: lastData.currentlyHome || [],
             recentVisits: lastData.recentVisits || [],
             favorites: lastData.favorites || [],
-            lastChecked: lastData.lastChecked || 0
+            lastChecked: lastData.lastChecked || 0,
+            logClearedAt: lastData.logClearedAt || 0
         }
     };
 
@@ -517,6 +519,27 @@ async function ResetCheck()
     }
 }
 
+async function ClearJournal()
+{
+    lastData.recentVisits = [];
+    lastData.logClearedAt = Math.floor(Date.now() / 1000);
+    journalVisits = [];
+
+    RenderWhileAway(lastData);
+    RenderRecentActivity();
+    RenderJournal();
+
+    try
+    {
+        await PushState();
+        Navigate("journal");
+    }
+    catch (error)
+    {
+        console.error("[Home Journal] Clear Log error:", error);
+    }
+}
+
 function Navigate(pageName)
 {
     document.querySelectorAll(".page").forEach(function (page)
@@ -591,7 +614,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.7");
+    console.log("BELMONTE HOME JOURNAL v6.8");
 
     FetchHomeData();
     UpdateClock();
