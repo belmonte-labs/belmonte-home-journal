@@ -45,7 +45,7 @@
                     <span class="status-dot"></span>
                     <span>SYSTEM ONLINE</span>
                 </div>
-                <div class="version">HOME JOURNAL v6.2</div>
+                <div class="version">HOME JOURNAL v6.4</div>
             </div>
         </aside>
 
@@ -121,6 +121,21 @@
                         <h2>Favorites</h2>
                         <p>Your most important residents and frequent visitors.</p>
                     </div>
+
+                    <div class="journal-toolbar">
+                        <input
+                            id="favNameInput"
+                            type="text"
+                            placeholder="Display name or username..."
+                            class="search"
+                        >
+                    </div>
+
+                    <div class="welcome" style="margin-bottom:24px;">
+                        <p id="favStatus">Type a name and tap Add Favorite.</p>
+                        <button class="sync-button" onclick="AddFavorite()">+ Add Favorite</button>
+                    </div>
+
                     <div class="favorites-grid" id="favoritesContainer"></div>
                 </div>
 
@@ -139,10 +154,10 @@
                         </div>
                         <div class="setting-card">
                             <div>
-                                <h3>Last Check</h3>
-                                <p>Reset the While You Were Away marker.</p>
+                                <h3>Reset Check</h3>
+                                <p>Only resets the While You Were Away marker.</p>
                             </div>
-                            <button class="action-button danger">Reset Check</button>
+                            <button class="action-button">Reset Check</button>
                         </div>
                     </div>
                 </div>
