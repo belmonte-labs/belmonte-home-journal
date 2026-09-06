@@ -417,7 +417,7 @@ function RenderFavorites(data)
                 <div class="favorite-mark">♥</div>
                 <div class="visitor-info">
                     <div class="visitor-name">${EscapeHtml(favorites[i])}</div>
-                    <div class="visitor-user">Recognized by the house</div>
+                    <div class="visitor-user">Always welcome</div>
                 </div>
                 <button class="text-button" onclick="RemoveFavoriteAt(${i})">Remove</button>
             </div>
