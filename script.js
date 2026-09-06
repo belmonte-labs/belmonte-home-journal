@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.4
-// Add Favorite works on prim (no prompt)
+// BELMONTE HOME JOURNAL v6.5
+// Add + Remove Favorite on prim
 //==================================================
 
 const API_URL =
@@ -335,13 +335,14 @@ function RenderFavorites(data)
     }
     else
     {
-        for (const favorite of favorites)
+        for (let i = 0; i < favorites.length; i++)
         {
             html += `
                 <div class="favorite-card">
                     <div class="favorite-heart">❤️</div>
-                    <h3>${EscapeHtml(favorite)}</h3>
+                    <h3>${EscapeHtml(favorites[i])}</h3>
                     <p>Favorite visitor</p>
+                    <button class="text-button" onclick="RemoveFavoriteAt(${i})">Remove</button>
                 </div>
             `;
         }
@@ -389,6 +390,32 @@ async function AddFavorite()
     {
         console.error("[Home Journal] Add Favorite error:", error);
         SetFavStatus("Could not save. Try again.");
+    }
+}
+
+async function RemoveFavoriteAt(index)
+{
+    const current = lastData.favorites || [];
+
+    if (index < 0 || index >= current.length)
+        return;
+
+    const removed = current[index];
+    current.splice(index, 1);
+    lastData.favorites = current;
+
+    RenderFavorites(lastData);
+    SetFavStatus("Removed: " + removed);
+
+    try
+    {
+        await PushState();
+        SetFavStatus("Removed: " + removed);
+    }
+    catch (error)
+    {
+        console.error("[Home Journal] Remove Favorite error:", error);
+        SetFavStatus("Could not remove. Try again.");
     }
 }
 
@@ -466,7 +493,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.4");
+    console.log("BELMONTE HOME JOURNAL v6.5");
 
     FetchHomeData();
     UpdateClock();
