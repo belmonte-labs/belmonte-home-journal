@@ -1,6 +1,6 @@
 //==================================================
-// BELMONTE HOME JOURNAL v6.6
-// While Away + Journal up to 50 + Home shows 10
+// BELMONTE HOME JOURNAL v6.7
+// Reset Check from the screen
 //==================================================
 
 const API_URL =
@@ -242,12 +242,15 @@ function RenderWhileAway(data)
     }
 
     let people = "";
+    const seen = [];
 
     for (const visit of awayVisits)
     {
         const key = String(visit.username || visit.name);
-        if (people.indexOf("@" + EscapeHtml(visit.username)) !== -1)
+        if (seen.indexOf(key) !== -1)
             continue;
+
+        seen.push(key);
 
         people += `
             <div class="activity-card">
@@ -498,6 +501,22 @@ async function RemoveFavoriteAt(index)
     }
 }
 
+async function ResetCheck()
+{
+    lastData.lastChecked = Math.floor(Date.now() / 1000);
+    RenderWhileAway(lastData);
+
+    try
+    {
+        await PushState();
+        Navigate("home");
+    }
+    catch (error)
+    {
+        console.error("[Home Journal] Reset Check error:", error);
+    }
+}
+
 function Navigate(pageName)
 {
     document.querySelectorAll(".page").forEach(function (page)
@@ -572,7 +591,7 @@ async function ManualSync()
 
 function Initialize()
 {
-    console.log("BELMONTE HOME JOURNAL v6.6");
+    console.log("BELMONTE HOME JOURNAL v6.7");
 
     FetchHomeData();
     UpdateClock();
